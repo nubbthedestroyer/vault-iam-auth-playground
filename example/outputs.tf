@@ -1,9 +1,9 @@
-output "vault_address" {
+output "vault_instance_address" {
   value       = "${module.vault.vault_address}"
   description = "endpoint to connect to the vault instance through the created ELB"
 }
 
-output "vault_connect_string" {
+output "vault_instance_connect_string" {
   value = "${module.vault.vault_connect_string}"
 }
 
