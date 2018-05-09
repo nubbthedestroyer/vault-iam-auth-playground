@@ -1,5 +1,5 @@
 provider "vault" {
-  address = "http://vault-300772179.us-east-1.elb.amazonaws.com:80"
+  address = "http://vault-805037257.us-east-1.elb.amazonaws.com:80"
   token   = "ef51813a-2317-20d7-9b52-39ce6c2740c0"
 }
 

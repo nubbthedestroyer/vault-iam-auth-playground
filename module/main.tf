@@ -249,7 +249,7 @@ EOF
 # TODO: test instance policy should be limited as well
 resource "aws_iam_role_policy" "testing_iam_instance_rolepolicy" {
   name = "testing-vault-ir-policy"
-  role = "${aws_iam_role.iam_instance_role.id}"
+  role = "${aws_iam_role.testing_iam_instance_role.id}"
 
   policy = <<EOF
 {
