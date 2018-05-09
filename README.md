@@ -2,7 +2,9 @@
 
 ## Intro
 
-The purpose of this repo is to provide a playground for Vault in IAM Authentication mode.
+The purpose of this repo is to provide a playground for Vault in IAM Authentication mode.  The project consists of 
+two separate terraform config sets.  One to build the AWS infrastructure and one to setup the vault config, auth methods,
+policies, and some test secrets.
 
 ## Getting started
 
@@ -11,7 +13,7 @@ Most importantly, ensure that you specify a key name that you have access to so 
 them.  If you dont have a key for the account you are building in, then create one.  Here is some documentation how
 https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html
 
-Pull this repo to your local machine, change to the repo, then run
+Pull this repo to your local machine, change to the repo, then run:
 
 ```bash
 cd example
@@ -203,3 +205,7 @@ auth role that your policy is mapped to.
 * Cross account authentication does not require a cross account trust because vault uses the AWS signed instance meta data 
 document to verify instance authenticity.
 
+TODOs for this repo
+* enable ASG with SSM based auto-unseal.
+* limit IAM policy at module/main.tf["testing_iam_instance_rolepolicy"], too broad at the moment 
+* better code commenting throughout
