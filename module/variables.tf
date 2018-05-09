@@ -41,7 +41,6 @@ variable "instance_type" {
 }
 
 variable "key-name" {
-  default     = "mlucas"
   description = "SSH key name for Vault instances"
 }
 
