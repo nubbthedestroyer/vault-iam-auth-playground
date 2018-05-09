@@ -147,7 +147,7 @@ terraform apply you ran earlier.  Once you've connected to the test instance, ve
 ```bash
 # use the host name exported by the terraform apply
 export VAULT_ADDR="${vault_address}"
-vault login -method=aws role=dev-role-iam
+vault login -method=aws role=aws-by-instanceprofile
 ```
 
 If everything worked out then you should have gotten something like this:
