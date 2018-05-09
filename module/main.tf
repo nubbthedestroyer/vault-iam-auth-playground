@@ -1,3 +1,4 @@
+# pull in the install script for vault server
 data "template_file" "install" {
     template = "${file("${path.module}/scripts/install.sh.tpl")}"
 
@@ -8,6 +9,7 @@ data "template_file" "install" {
     }
 }
 
+# Client only install for the test instance
 data "template_file" "install_client_only" {
     template = "${file("${path.module}/scripts/install-client-only.sh.tpl")}"
 
@@ -17,6 +19,7 @@ data "template_file" "install_client_only" {
     }
 }
 
+# holding onto this to re-enable later with SSM based auto-unseal
 // We launch Vault into an ASG so that it can properly bring them up for us.
 //resource "aws_autoscaling_group" "vault" {
 //    name = "vault - ${aws_launch_configuration.vault.name}"
@@ -46,6 +49,7 @@ data "template_file" "install_client_only" {
 //    iam_instance_profile = "${aws_iam_instance_profile.asg_instance_profile.id}"
 //}
 
+# Single Vault instance
 resource "aws_instance" "vault-a" {
     ami                    = "${var.ami}"
     instance_type           = "${var.instance_type}"
@@ -60,6 +64,7 @@ resource "aws_instance" "vault-a" {
     }
 }
 
+# Test instance for testing instanceprofile based authentication
 resource "aws_instance" "vault-test-instance" {
     ami                    = "${var.ami}"
     instance_type           = "${var.instance_type}"
@@ -74,8 +79,7 @@ resource "aws_instance" "vault-test-instance" {
     }
 }
 
-// Security group for Vault allows SSH and HTTP access (via "tcp" in
-// case TLS is used)
+# Security group for Vault allows SSH and HTTP access (via "tcp" in case TLS is used)
 resource "aws_security_group" "vault" {
     name = "vault"
     description = "Vault servers"
@@ -91,8 +95,8 @@ resource "aws_security_group_rule" "vault-ssh" {
     cidr_blocks = ["0.0.0.0/0"]
 }
 
-// This rule allows Vault HTTP API access to individual nodes, since each will
-// need to be addressed individually for unsealing.
+# This rule allows Vault HTTP API access to individual nodes, since each will
+# need to be addressed individually for unsealing.
 resource "aws_security_group_rule" "vault-http-api" {
     security_group_id = "${aws_security_group.vault.id}"
     type = "ingress"
@@ -111,8 +115,8 @@ resource "aws_security_group_rule" "vault-egress" {
     cidr_blocks = ["0.0.0.0/0"]
 }
 
-// Launch the ELB that is serving Vault. This has proper health checks
-// to only serve healthy, unsealed Vaults.
+# Launch the ELB that is serving Vault. This has proper health checks
+# to only serve healthy, unsealed Vaults.
 resource "aws_elb" "vault" {
     name = "vault"
     connection_draining = true
@@ -178,6 +182,7 @@ resource "aws_security_group_rule" "vault-elb-egress" {
     cidr_blocks = ["0.0.0.0/0"]
 }
 
+# IAM role to use for the instanceprofile
 resource "aws_iam_role" "iam_instance_role" {
   name = "vault-ir"
 
@@ -198,6 +203,8 @@ resource "aws_iam_role" "iam_instance_role" {
 EOF
 }
 
+# policy for the instanceprofile
+# TODO: need to limit this policy
 resource "aws_iam_role_policy" "iam_instance_rolepolicy" {
   name = "vault-ir-policy"
   role = "${aws_iam_role.iam_instance_role.id}"
@@ -217,6 +224,7 @@ resource "aws_iam_role_policy" "iam_instance_rolepolicy" {
 EOF
 }
 
+# iam role for the test instance
 resource "aws_iam_role" "testing_iam_instance_role" {
   name = "testing-vault-ir"
 
@@ -237,6 +245,8 @@ resource "aws_iam_role" "testing_iam_instance_role" {
 EOF
 }
 
+# policy for the test instance
+# TODO: test instance policy should be limited as well
 resource "aws_iam_role_policy" "testing_iam_instance_rolepolicy" {
   name = "testing-vault-ir-policy"
   role = "${aws_iam_role.iam_instance_role.id}"
@@ -256,6 +266,7 @@ resource "aws_iam_role_policy" "testing_iam_instance_rolepolicy" {
 EOF
 }
 
+# create the actual instance profiles.  These get attached in the "aws_instance" blocks
 resource "aws_iam_instance_profile" "asg_instance_profile" {
   name = "vault-profile"
   role = "${aws_iam_role.iam_instance_role.name}"
