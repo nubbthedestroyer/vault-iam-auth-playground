@@ -177,7 +177,7 @@ token_meta_inferred_aws_region     us-east-1
 Now we will want to test the key we created to see if we are really authenticated.
 
 ```bash
-vault kv get secret/aws-by-instanceprofile
+vault kv get secret/aws-by-instanceprofile/diditwork
 ```
 
 If you got the following:
